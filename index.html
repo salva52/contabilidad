@@ -164,6 +164,14 @@ details.sol summary{cursor:pointer;font-weight:600;color:var(--accent);padding:6
 .reset{max-width:1180px;margin:0 auto;padding:16px 16px 48px;font-size:.9rem;color:var(--muted)}
 .reset .btn{margin-right:8px;margin-top:6px}
 
+.teach{background:var(--accent-soft);border-radius:10px;padding:12px 16px;margin:6px 0 12px;font-size:.95rem}
+.teach p{margin:4px 0}
+.teach ul,.teach ol{margin:6px 0;padding-left:20px}
+.teach li{margin:3px 0}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:14px;align-items:start}
+.two .tw{margin:0}
+.stp .pr{margin-left:auto}
+.blk{padding-bottom:6px}
 @media (max-width:860px){
   .wrap{grid-template-columns:minmax(0,1fr);gap:14px}
   .nav{position:static;flex-direction:row;overflow-x:auto;padding-bottom:6px;gap:8px}
@@ -329,9 +337,9 @@ function fieldHTML(ex,f){
   else h+='<input id="'+id+'" type="text" inputmode="decimal" autocomplete="off" placeholder="0">';
   return h+'<div class="msg"></div></div>';
 }
-function stmtHTML(ex,mode){
+function stmtHTML(ex,mode,flds){
   var h='<div class="tw"><table class="stmt"><tbody>';
-  ex.fields.forEach(function(f){
+  (flds||ex.fields).forEach(function(f){
     if(f.h){ h+='<tr class="sh"><td colspan="3">'+f.h+'</td></tr>'; return; }
     if(f.g){ h+='<tr'+(f.b?' class="b"':'')+'><td>'+f.label+'</td><td class="n">'+m(f.a)+'</td><td></td></tr>'; return; }
     h+='<tr class="'+(mode==='form'?'fld ':'')+(f.b?'b':'')+'" data-f="'+f.id+'"><td>'+f.label+'</td><td class="n">'+
@@ -342,6 +350,7 @@ function stmtHTML(ex,mode){
 }
 
 /* ---------- Contenido ---------- */
+var CLS=['Activo corriente','Activo no corriente','Pasivo corriente','Pasivo no corriente','Se divide en corriente y no corriente','Patrimonio','Estado de resultados'];
 var HOJA_HOW='<li>Cada ajuste va en una <b>hoja de asientos</b> con las columnas <b>FECHA, AD#, CUENTAS, DEBE y HABER</b>. En la página los pasos están numerados con círculos (1 a 6) para que ubiques cada columna.</li>'+
  '<li><b>FECHA:</b> 31/12, solo en la primera fila. <b>AD#:</b> el número de la cuenta. En tu examen más reciente (202520) el alumno que sacó 20/20 puso el número de cuenta en esa columna.</li>'+
  '<li><b>CUENTAS:</b> escribe primero las del Debe y luego las del Haber, un poco a la derecha. En <b>DEBE</b> y <b>HABER</b> pones el monto en la columna que le toca. Los dos totales deben ser iguales.</li>'+
@@ -761,56 +770,53 @@ var TOPICS=[
  rule:'<ol>'+
  '<li><b>Clasifica</b> cada cuenta del balance de comprobación: AC, ANC, PC, PNC, Patrimonio o estado de resultados.</li>'+
  '<li><b>Estado de resultados:</b> utilidad bruta, operativa y antes de impuestos. Después el IR de 29.5% y la utilidad neta.</li>'+
- '<li><b>Reserva legal del periodo</b> = el menor entre 10% de la utilidad neta y lo que falta para llegar al 20% del capital. <b>Reserva acumulada</b> = la que ya había + la del periodo.</li>'+
- '<li><b>Utilidad de libre disposición</b> = utilidad neta − reserva del periodo. <b>Resultados acumulados totales</b> = los de antes + la utilidad de libre disposición.</li>'+
- '<li><b>Balance:</b> activos netos de la 19 y la 39. En el pasivo corriente incluye el <b>IR por pagar</b>. Divide las cuentas por pagar según la información adicional.</li>'+
+ '<li><b>Reserva legal del periodo</b> = el menor entre 10% de la utilidad neta y lo que falta para llegar al 20% del capital.</li>'+
+ '<li><b>Utilidad de libre disposición</b> = utilidad neta − reserva del periodo.</li>'+
+ '<li><b>Balance:</b> activos netos de la 19 y la 39. El <b>IR por pagar</b> va en el pasivo corriente. Las cuentas por pagar se dividen según la información adicional.</li>'+
  '<li><b>Cuadre:</b> total activo = total pasivo + patrimonio.</li></ol>',
- how:'<ol>'+
- '<li>Antes de calcular, anota al lado de cada cuenta del balance su bloque: <b>AC</b>, <b>ANC</b>, <b>PC</b> (pasivo corriente), <b>PNC</b>, <b>Pat</b> o <b>ER</b>. Es lo que hizo el alumno de la foto y evita olvidar cuentas.</li>'+
- '<li>El <b>estado de resultados</b> viene impreso hasta la utilidad antes de impuestos. Tú completas <b>impuesto a la renta</b>, <b>utilidad neta</b>, <b>reserva legal</b> y <b>utilidad de libre disposición</b>.</li>'+
- '<li>Haz la cuenta de la reserva legal aparte, en tu borrador: 10% de la utilidad neta y cuánto falta para el 20% del capital.</li>'+
- '<li>En el <b>balance</b>, la depreciación acumulada y la estimación de cobranza dudosa se escriben como línea negativa, y el total del bloque ya las descuenta.</li>'+
- '<li>Si la información adicional dice cuánto se paga en cada año, <b>divide</b> la cuenta por pagar: lo del próximo año va al pasivo corriente y el resto al no corriente.</li>'+
- '<li>La tabla <b>"Se solicita"</b> repite números que ya calculaste. Cópialos de tu hoja y revisa que no quede ninguno en blanco.</li>'+
- '<li>Si el balance no cuadra, revisa primero que hayas puesto el <b>IR por pagar</b> en el pasivo corriente.</li></ol>'+
+ how:'<p>El examen es una hoja con <b>4 partes, siempre en este orden</b>:</p><ol>'+
+ '<li><b>Los datos:</b> el balance de comprobación ajustado (las cuentas con sus saldos) y la información adicional. Aquí no escribes nada, solo lo lees.</li>'+
+ '<li><b>Estado de resultados:</b> viene impreso hasta la <i>utilidad antes de impuestos</i>. Tú completas las líneas de abajo: impuesto, utilidad neta, reserva legal y utilidad de libre disposición.</li>'+
+ '<li><b>Estado de situación financiera:</b> en blanco. Los activos van a la izquierda y los pasivos y el patrimonio a la derecha.</li>'+
+ '<li><b>Tabla "Se solicita":</b> 9 números sueltos que el profe quiere ver aparte.</li></ol>'+
+ '<p><b>¿Por qué se repiten los números?</b> Cada número se calcula <b>una sola vez</b> y después aparece en 2 o 3 lugares. Por ejemplo, la reserva legal se calcula en tu hoja de borrador, se escribe en el estado de resultados, se suma en el patrimonio del balance y vuelve a salir en la tabla "Se solicita". Por eso aquí lo hacemos en <b>5 pasos</b>: calculas cada cosa una vez y después la copias donde toque. Cada paso tiene su propio botón "Comprobar".</p>'+
  tableHTMLStatic({head:['Cuenta','Bloque'],rows:[
    ['10, 12 menos la 19, 18, 20','Activo corriente'],['33 menos la 39','Activo no corriente'],
    ['40 (IGV), 41, IR por pagar, obligaciones de corto plazo','Pasivo corriente'],
    ['42 la parte que se paga el próximo año','Pasivo corriente'],
-   ['42 la parte que se paga después, 45 de largo plazo','Pasivo no corriente'],['50, 58 (más la del periodo), 59 (más la libre disposición)','Patrimonio']]}),
+   ['42 la parte que se paga después, obligaciones de largo plazo','Pasivo no corriente'],['50, 58 (más la del periodo), 59 (más la libre disposición)','Patrimonio']]}),
  real:[
  {id:'x-r1',title:'MULTISERVICIOS TAMBO: estados financieros 2025',source:'Examen de la foto (Ejercicio 4). Resuelto aquí con los números correctos.',
-  enun:'<p>MULTISERVICIOS TAMBO S.A.C., dedicada a la comercialización de artículos de oficina, presenta el siguiente balance de comprobación ajustado al 31.12.2025.</p><p><b>Información adicional:</b> las cuentas por pagar comerciales se pagarán S/ 30,000 en el 2026 y el saldo restante en el 2027.</p><p><b>Se solicita:</b> el estado de resultados (impreso hasta la utilidad antes de impuestos), el estado de situación financiera y la tabla de 9 respuestas.</p>',
+  enun:'<p>MULTISERVICIOS TAMBO S.A.C., dedicada a la comercialización de artículos de oficina, presenta el siguiente balance de comprobación ajustado al 31.12.2025.</p><p><b>Información adicional:</b> las cuentas por pagar comerciales se pagarán S/ 30,000 en el 2026 y el saldo restante en el 2027.</p><p><b>Se solicita:</b> completar el estado de resultados (impreso hasta la utilidad antes de impuestos), el estado de situación financiera y la tabla de 9 respuestas.</p>',
   enunTable:{head:['Cuentas contables','Saldos','Deudor','Acreedor'],rows:[
    ['Efectivo y equivalentes de efectivo','130,000','130,000',''],['Cuentas por cobrar comerciales','40,000','40,000',''],['Mercaderías','65,000','65,000',''],['Propiedad, planta y equipo','125,000','125,000',''],
    ['Depreciación y amortización acumulados','40,000','','40,000'],['Servicios y otros contratados por anticipado','25,000','25,000',''],['Cuentas por pagar comerciales','50,000','','50,000'],['Obligaciones financieras','15,000','','15,000'],
    ['Capital','140,000','','140,000'],['Reservas - Legal','20,000','','20,000'],['Resultados acumulados','25,000','','25,000'],['Ventas','365,000','','365,000'],['Ingresos financieros','5,000','','5,000'],
    ['Costo de ventas','220,000','220,000',''],['Gastos de servicios prestados por terceros','45,000','45,000',''],['Otros gastos de gestión','10,000','10,000',''],['!TOTALES','','660,000','660,000']]},
-  steps:[
-   '<b>Clasifica:</b> 10, 12, 20 y 18 son AC. 33 es ANC y la 39 la resta. 42 y 45 son pasivos. 50, 58 y 59 son patrimonio. Del 70 al 77 y 69, 63 y 65 van al estado de resultados.',
-   '<b>Estado de resultados (lo impreso):</b> utilidad bruta 365,000 − 220,000 = 145,000. Gastos 45,000 + 10,000 y utilidad operativa 90,000. Más ingresos financieros 5,000: utilidad antes de impuestos <b>95,000</b>.',
-   '<b>Impuesto:</b> 95,000 × 29.5% = <b>28,025</b>. Utilidad neta: 95,000 − 28,025 = <b>66,975</b>.',
-   '<b>Reserva legal:</b> 10% × 66,975 = 6,697.5, que redondeas a <b>6,698</b>. Tope: 20% × 140,000 = 28,000; ya hay 20,000, así que faltan 8,000. Como 6,698 es menor que 8,000, la reserva del periodo es <b>6,698</b>. Reserva acumulada: 20,000 + 6,698 = <b>26,698</b>.',
-   '<b>Libre disposición:</b> 66,975 − 6,698 = <b>60,277</b>. Resultados acumulados totales: 25,000 + 60,277 = <b>85,277</b>.',
-   '<b>Activo:</b> corriente 130,000 + 40,000 + 65,000 + 25,000 = <b>260,000</b>. No corriente: 125,000 − 40,000 = <b>85,000</b>. Total activo <b>345,000</b>.',
-   '<b>Pasivo:</b> las cuentas por pagar son 50,000: 30,000 vencen en 2026 (corriente) y 50,000 − 30,000 = 20,000 en 2027 (no corriente). Pasivo corriente: 30,000 + obligaciones financieras 15,000 + <b>IR por pagar 28,025</b> = <b>73,025</b>. Pasivo no corriente: 20,000. Total pasivo: 93,025.',
-   '<b>Patrimonio:</b> 140,000 + 26,698 + 85,277 = <b>251,975</b>.',
-   '<b>Cuadre:</b> 93,025 + 251,975 = 345,000, igual al activo.'],
-  layout:'stmt',
-  fields:[H('Estado de resultados integrales, por el año terminado el 31 de diciembre de 2025 (lo impreso en el examen)'),
-   G('Ventas',365000),G('(−) Costo de ventas',220000),G('Utilidad bruta',145000,true),G('(−) Gastos de personal y directores',45000),G('(−) Otros gastos de gestión (seguros)',10000),G('Utilidad operativa',90000,true),G('(+) Ingresos financieros',5000),G('Utilidad antes de impuestos',95000,true),
-   H('Lo que completas en el estado de resultados'),
-   N('ir','(−) Impuesto a la renta 29.5%',28025),NB('un','Utilidad neta',66975),N('rl','Reserva legal del periodo',6698),NB('ul','Utilidad de libre disposición',60277),
-   H('Borrador: reserva legal'),N('r10','10% de la utilidad neta',6697.5),N('room','Lo que falta para llegar al 20% del capital (28,000 − 20,000)',8000),
-   H('Estado de situación financiera al 31 de diciembre de 2025'),
-   H('ACTIVO CORRIENTE'),N('a1','Efectivo y equivalentes de efectivo',130000),N('a2','Cuentas por cobrar comerciales',40000),N('a3','Mercaderías',65000),N('a4','Servicios y otros contratados por anticipado',25000),NB('ac','Total activo corriente',260000),
-   H('ACTIVO NO CORRIENTE'),N('a5','Propiedad, planta y equipo',125000),N('a6','(−) Depreciación y amortización acumulados',-40000),NB('anc','Total activo no corriente',85000),NB('ta','TOTAL ACTIVO',345000),
-   H('PASIVO CORRIENTE'),N('p1','Cuentas por pagar comerciales (se pagan en 2026)',30000),N('p2','Obligaciones financieras',15000),N('p3','Impuesto a la renta por pagar',28025),NB('pc','Total pasivo corriente',73025),
-   H('PASIVO NO CORRIENTE'),N('p4','Cuentas por pagar comerciales (se pagan en 2027)',20000),NB('pnc','Total pasivo no corriente',20000),NB('tp','TOTAL PASIVO',93025),
-   H('PATRIMONIO'),N('e1','Capital',140000),N('e2','Reserva legal (20,000 + 6,698)',26698),N('e3','Resultados acumulados (25,000 + 60,277)',85277),NB('pat','Total patrimonio',251975),NB('tpp','TOTAL PASIVO Y PATRIMONIO',345000),
-   H('Se solicita (tabla de respuestas)'),
-   N('q1','1. Reserva legal elegida del periodo',6698),N('q2','2. Reserva legal acumulada',26698),N('q3','3. Utilidad de libre disposición',60277),N('q4','4. Total activo corriente',260000),N('q5','5. Total activo no corriente',85000),N('q6','6. Total pasivo corriente',73025),N('q7','7. Total patrimonio',251975),N('q8','8. Total resultados acumulados',85277),N('q9','9. Impuesto a la renta 3.ª categoría del ejercicio',28025)],
-  note:'En la foto, la columna Saldos de cuentas por pagar dice 20,000 y la columna Acreedor dice 50,000. Solo con 50,000 el balance cuadra (660,000 contra 660,000), y además 30,000 + 20,000 de la información adicional suman 50,000. En la hoja de la foto el pasivo corriente salió 45,000 porque no se incluyó el IR por pagar de 28,025, y por eso el total no cuadró (306,975 contra un activo de 345,000). Además la plantilla imprime "Gastos de personal y directores" por 45,000, aunque en el balance esa cuenta dice "servicios prestados por terceros": es el mismo monto. Como el enunciado no da plazo de las obligaciones financieras, las puse en el pasivo corriente igual que el alumno de la foto. Si dudas, pregúntale al profe.'}
+  blocks:[
+   {t:'Clasifica cada cuenta',kind:'class',
+    teach:'<p>Antes de calcular, escribe al lado de cada cuenta <b>dónde va</b>. Es lo que el alumno de la foto anotó a la izquierda (AC, ANC, P, Pat). Te evita olvidar cuentas, y la que más se olvida es el IR por pagar.</p><ul><li><b>Activo corriente:</b> lo que se vuelve dinero en menos de 12 meses.</li><li><b>Activo no corriente:</b> maquinaria y equipos. La depreciación acumulada se resta aquí.</li><li><b>Pasivo corriente:</b> deudas que pagas en menos de 12 meses.</li><li><b>Pasivo no corriente:</b> deudas que pagas después.</li><li><b>Patrimonio:</b> capital, reservas y resultados acumulados.</li><li><b>Estado de resultados:</b> ventas, costos, gastos e ingresos del año.</li></ul>',
+    fields:[C('c0','Efectivo y equivalentes de efectivo',CLS,'Activo corriente'),C('c1','Cuentas por cobrar comerciales',CLS,'Activo corriente'),C('c2','Mercaderías',CLS,'Activo corriente'),C('c3','Propiedad, planta y equipo',CLS,'Activo no corriente'),C('c4','Depreciación y amortización acumulados',CLS,'Activo no corriente'),C('c5','Servicios y otros contratados por anticipado',CLS,'Activo corriente'),C('c6','Cuentas por pagar comerciales',CLS,'Se divide en corriente y no corriente'),C('c7','Obligaciones financieras',CLS,'Pasivo corriente'),C('c8','Capital',CLS,'Patrimonio'),C('c9','Reservas - Legal',CLS,'Patrimonio'),C('c10','Resultados acumulados',CLS,'Patrimonio'),C('c11','Ventas',CLS,'Estado de resultados'),C('c12','Ingresos financieros',CLS,'Estado de resultados'),C('c13','Costo de ventas',CLS,'Estado de resultados'),C('c14','Gastos de servicios prestados por terceros',CLS,'Estado de resultados'),C('c15','Otros gastos de gestión',CLS,'Estado de resultados')],
+    sol:['Las cuentas por pagar comerciales <b>se dividen</b>, porque la información adicional dice que 30,000 se paga en 2026 y el resto en 2027.','Las obligaciones financieras no traen plazo en el enunciado, así que las puse en el pasivo corriente (igual que el alumno de la foto).']},
+   {t:'Estado de resultados: impuesto y utilidad neta',kind:'stmt',
+    teach:'<p>El examen ya trae <b>impreso</b> todo hasta la <b>utilidad antes de impuestos</b> (95,000). Tú solo completas dos líneas:</p><ol><li><b>Impuesto a la renta</b> = utilidad antes de impuestos × 29.5%.</li><li><b>Utilidad neta</b> = utilidad antes de impuestos − impuesto.</li></ol>',
+    fields:[H('Estado de resultados integrales por el año terminado el 31 de diciembre de 2025 (impreso)'),G('Ventas',365000),G('(−) Costo de ventas',220000),G('Utilidad bruta',145000,true),G('(−) Gastos de personal y directores',45000),G('(−) Otros gastos de gestión (seguros)',10000),G('Utilidad operativa',90000,true),G('(+) Ingresos financieros',5000),G('Utilidad antes de impuestos',95000,true),H('Lo que completas tú'),N('ir','(−) Impuesto a la renta 29.5%',28025),NB('un','Utilidad neta',66975)],
+    sol:['Impuesto: 95,000 × 0.295 = <b>28,025</b>.','Utilidad neta: 95,000 − 28,025 = <b>66,975</b>.']},
+   {t:'Reserva legal y utilidad de libre disposición (tu hoja de borrador)',kind:'stmt',
+    teach:'<p>La ley obliga a guardar cada año el <b>10% de la utilidad neta</b> como reserva legal, hasta que la reserva llegue al <b>20% del capital</b>. Por eso hay dos números y te quedas con el menor:</p><ol><li><b>a)</b> El 10% de la utilidad neta.</li><li><b>b)</b> El tope: 20% del capital.</li><li><b>c)</b> El espacio que queda: tope − la reserva que ya tienes.</li><li><b>d)</b> La reserva del periodo es el <b>menor</b> entre a) y c).</li></ol><p>Con eso sacas la reserva acumulada, la utilidad de libre disposición y los resultados acumulados totales. En el examen todo esto lo haces en la hoja de atrás: no está impreso.</p>',
+    fields:[N('r10','a) 10% de la utilidad neta',6697.5),N('cap20','b) Tope: 20% del capital',28000),N('room','c) Espacio que queda: b) − reserva legal actual',8000),NB('rl','d) Reserva legal del periodo (el menor entre a y c)',6698),NB('racum','e) Reserva legal acumulada: la actual + d)',26698),NB('ul','f) Utilidad de libre disposición: utilidad neta − d)',60277),NB('ra','g) Resultados acumulados totales: los actuales + f)',85277)],
+    sol:['a) 10% × 66,975 = 6,697.5.','b) 20% × 140,000 = 28,000.','c) 28,000 − 20,000 = 8,000.','d) El menor entre 6,697.5 y 8,000 es 6,697.5, que redondeas a <b>6,698</b>.','e) 20,000 + 6,698 = <b>26,698</b>.','f) 66,975 − 6,698 = <b>60,277</b>.','g) 25,000 + 60,277 = <b>85,277</b>.']},
+   {t:'Estado de situación financiera',kind:'two',
+    teach:'<p>Activos a la izquierda; pasivos y patrimonio a la derecha. Tres reglas:</p><ol><li>La <b>depreciación acumulada</b> se escribe con signo menos y el total del bloque ya la descuenta.</li><li>El <b>impuesto a la renta por pagar</b> (paso 2) va en el pasivo corriente: todavía no se paga.</li><li>Las <b>cuentas por pagar</b> se dividen: 30,000 en 2026 (corriente) y el resto en 2027 (no corriente).</li></ol><p>En el patrimonio usa los resultados de tu paso 3: reserva acumulada (e) y resultados acumulados totales (g).</p>',
+    cols:[[H('ACTIVOS CORRIENTES'),N('a1','Efectivo y equivalentes de efectivo',130000),N('a2','Cuentas por cobrar comerciales',40000),N('a3','Mercaderías',65000),N('a4','Servicios y otros contratados por anticipado',25000),NB('ac','Total activo corriente',260000),H('ACTIVOS NO CORRIENTES'),N('a5','Propiedad, planta y equipo',125000),N('a6','(−) Depreciación y amortización acumulados',-40000),NB('anc','Total activo no corriente',85000),NB('ta','TOTAL ACTIVO',345000)],
+          [H('PASIVO CORRIENTE'),N('p1','Cuentas por pagar comerciales (2026)',30000),N('p2','Obligaciones financieras',15000),N('p3','Impuesto a la renta por pagar',28025),NB('pc','Total pasivo corriente',73025),H('PASIVO NO CORRIENTE'),N('p4','Cuentas por pagar comerciales (2027)',20000),NB('pnc','Total pasivo no corriente',20000),NB('tp','TOTAL PASIVO',93025),H('PATRIMONIO'),N('e1','Capital',140000),N('e2','Reserva legal',26698),N('e3','Resultados acumulados',85277),NB('pat','Total patrimonio',251975),NB('tpp','TOTAL PASIVO Y PATRIMONIO',345000)]],
+    sol:['Activo corriente: 130,000 + 40,000 + 65,000 + 25,000 = <b>260,000</b>. No corriente: 125,000 − 40,000 = <b>85,000</b>. Total activo: <b>345,000</b>.','Cuentas por pagar: 50,000 en total. 30,000 en 2026 y 50,000 − 30,000 = 20,000 en 2027.','Pasivo corriente: 30,000 + 15,000 + 28,025 = <b>73,025</b>. Pasivo no corriente: <b>20,000</b>. Total pasivo: <b>93,025</b>.','Patrimonio: 140,000 + 26,698 + 85,277 = <b>251,975</b>.','Cuadre: 93,025 + 251,975 = <b>345,000</b>, igual que el activo.']},
+   {t:'Tabla "Se solicita"',kind:'stmt',
+    teach:'<p>Aquí <b>no calculas nada nuevo</b>: copias números que ya sacaste en los pasos anteriores. El profe los pide aparte para calificarte más fácil. Al lado de cada ítem te dejo de qué paso sale.</p>',
+    fields:[N('q1','1. Reserva legal elegida del periodo (paso 3, d)',6698),N('q2','2. Reserva legal acumulada (paso 3, e)',26698),N('q3','3. Utilidad de libre disposición (paso 3, f)',60277),N('q4','4. Total activo corriente (paso 4)',260000),N('q5','5. Total activo no corriente (paso 4)',85000),N('q6','6. Total pasivo corriente (paso 4)',73025),N('q7','7. Total patrimonio (paso 4)',251975),N('q8','8. Total resultados acumulados (paso 3, g)',85277),N('q9','9. Impuesto a la renta 3.ª categoría del ejercicio (paso 2)',28025)],
+    sol:['Los ítems 1, 2, 3 y 8 salen del paso 3. Los ítems 4, 5, 6 y 7 salen del balance (paso 4). El ítem 9 es el impuesto del paso 2.']}],
+  finalER:[H('Estado de resultados integrales, por el año terminado el 31 de diciembre de 2025'),G('Ventas',365000),G('(−) Costo de ventas',220000),G('Utilidad bruta',145000,true),G('(−) Gastos de personal y directores',45000),G('(−) Otros gastos de gestión (seguros)',10000),G('Utilidad operativa',90000,true),G('(+) Ingresos financieros',5000),G('Utilidad antes de impuestos',95000,true),G('(−) Impuesto a la renta 29.5%',28025),G('Utilidad neta',66975,true),G('Reserva legal',6698),G('Utilidad de libre disposición',60277,true)],
+  note:'Errores típicos en la hoja de la foto: el pasivo corriente salió 45,000 porque faltó el IR por pagar (28,025), y por eso el balance no cuadró (306,975 contra un activo de 345,000). En la tabla, el ítem 8 (resultados acumulados totales) es 85,277, no 60,277. Además, la columna Saldos de cuentas por pagar dice 20,000 pero la columna Acreedor dice 50,000: solo con 50,000 cuadra el balance (660,000 contra 660,000). La plantilla imprime "Gastos de personal y directores" por 45,000 aunque el balance dice "servicios prestados por terceros": es el mismo monto. Como el enunciado no da plazo de las obligaciones financieras, las puse en corriente; si dudas, pregúntale al profe.'}
  ],
  practice:[
  {id:'x-p1',title:'Práctica 1: OFICENTRO PERÚ (comercializadora de útiles)',
@@ -819,41 +825,56 @@ var TOPICS=[
    ['Efectivo y equivalentes de efectivo','340,000','340,000',''],['Cuentas por cobrar comerciales','80,000','80,000',''],['Estimación de cuentas de cobranza dudosa','5,000','','5,000'],['Mercaderías','120,000','120,000',''],['Propiedad, planta y equipo','300,000','300,000',''],['Depreciación y amortización acumulados','110,000','','110,000'],['Servicios y otros contratados por anticipado','15,000','15,000',''],
    ['Tributos por pagar - IGV','18,000','','18,000'],['Cuentas por pagar comerciales','160,000','','160,000'],['Obligaciones financieras - largo plazo','90,000','','90,000'],['Capital','250,000','','250,000'],['Reservas - Legal','30,000','','30,000'],['Resultados acumulados','40,000','','40,000'],['Ventas','860,000','','860,000'],['Ingresos financieros','4,000','','4,000'],
    ['Costo de ventas','540,000','540,000',''],['Gastos de personal y directores','90,000','90,000',''],['Gastos de servicios prestados por terceros','40,000','40,000',''],['Valuación y deterioro de activos (depreciación)','30,000','30,000',''],['Gasto financiero','12,000','12,000',''],['!TOTALES','','1,567,000','1,567,000']]},
-  layout:'stmt',fieldsTitle:'Tu hoja de examen: estado de resultados, balance y tabla "Se solicita"',
-  fields:[H('Estado de resultados integrales, por el año terminado el 31 de diciembre de 2025 (impreso)'),
-   G('Ventas',860000),G('(−) Costo de ventas',540000),G('Utilidad bruta',320000,true),G('(−) Gastos de personal y directores',90000),G('(−) Servicios prestados por terceros',40000),G('(−) Valuación y deterioro (depreciación)',30000),G('Utilidad operativa',160000,true),G('(+) Ingresos financieros',4000),G('(−) Gastos financieros',12000),G('Utilidad antes de impuestos',152000,true),
-   H('Lo que completas en el estado de resultados'),
-   N('ir','(−) Impuesto a la renta 29.5%',44840),NB('un','Utilidad neta',107160),N('rl','Reserva legal del periodo',10716),NB('ul','Utilidad de libre disposición',96444),
-   H('Borrador: reserva legal'),N('r10','10% de la utilidad neta',10716),N('room','Lo que falta para llegar al 20% del capital',20000),
-   H('Estado de situación financiera al 31 de diciembre de 2025'),
-   H('ACTIVO CORRIENTE'),N('a1','Efectivo y equivalentes de efectivo',340000),N('a2','Cuentas por cobrar comerciales',80000),N('a2b','(−) Estimación de cobranza dudosa',-5000),N('a3','Mercaderías',120000),N('a4','Servicios y otros contratados por anticipado',15000),NB('ac','Total activo corriente',550000),
-   H('ACTIVO NO CORRIENTE'),N('a5','Propiedad, planta y equipo',300000),N('a6','(−) Depreciación y amortización acumulados',-110000),NB('anc','Total activo no corriente',190000),NB('ta','TOTAL ACTIVO',740000),
-   H('PASIVO CORRIENTE'),N('p1','Tributos por pagar (IGV)',18000),N('p2','Impuesto a la renta por pagar',44840),N('p3','Cuentas por pagar comerciales (2026)',100000),NB('pc','Total pasivo corriente',162840),
-   H('PASIVO NO CORRIENTE'),N('p4','Cuentas por pagar comerciales (2027)',60000),N('p5','Obligaciones financieras largo plazo',90000),NB('pnc','Total pasivo no corriente',150000),NB('tp','TOTAL PASIVO',312840),
-   H('PATRIMONIO'),N('e1','Capital',250000),N('e2','Reserva legal',40716),N('e3','Resultados acumulados',136444),NB('pat','Total patrimonio',427160),NB('tpp','TOTAL PASIVO Y PATRIMONIO',740000),
-   H('Se solicita (tabla de respuestas)'),
-   N('q1','1. Reserva legal elegida del periodo',10716),N('q2','2. Reserva legal acumulada',40716),N('q3','3. Utilidad de libre disposición',96444),N('q4','4. Total activo corriente',550000),N('q5','5. Total activo no corriente',190000),N('q6','6. Total pasivo corriente',162840),N('q7','7. Total patrimonio',427160),N('q8','8. Total resultados acumulados',136444),N('q9','9. Impuesto a la renta 3.ª categoría del ejercicio',44840)],
-  steps:['Utilidad antes de impuestos: 860,000 − 540,000 = 320,000; menos gastos 160,000 = 160,000 de utilidad operativa; más 4,000 y menos 12,000 = <b>152,000</b>.','IR: 152,000 × 29.5% = <b>44,840</b>. Utilidad neta: <b>107,160</b>.','Reserva: 10% = 10,716. Tope: 20% × 250,000 = 50,000, menos 30,000 = 20,000 de espacio. Reserva del periodo: <b>10,716</b>. Acumulada: 30,000 + 10,716 = <b>40,716</b>.','Libre disposición: 107,160 − 10,716 = <b>96,444</b>. Resultados acumulados: 40,000 + 96,444 = <b>136,444</b>.','Activo corriente: 340,000 + 80,000 − 5,000 + 120,000 + 15,000 = <b>550,000</b>. No corriente: 300,000 − 110,000 = <b>190,000</b>. Total: 740,000.','Pasivo corriente: IGV 18,000 + IR 44,840 + cuentas por pagar 2026 100,000 = <b>162,840</b>. No corriente: cuentas por pagar 2027 (160,000 − 100,000 = 60,000) + obligaciones 90,000 = <b>150,000</b>. Total pasivo: 312,840.','Patrimonio: 250,000 + 40,716 + 136,444 = <b>427,160</b>. Cuadre: 312,840 + 427,160 = 740,000.']},
+  blocks:[
+   {t:'Clasifica cada cuenta',kind:'class',
+    teach:'<p>Escribe dónde va cada cuenta del balance. La <b>estimación de cobranza dudosa</b> es un activo corriente que resta. La depreciación acumulada va en el activo no corriente y resta. Si la cuenta tiene un plazo (por ejemplo, largo plazo), eso decide el bloque.</p>',
+    fields:[C('c0','Efectivo y equivalentes de efectivo',CLS,'Activo corriente'),C('c1','Cuentas por cobrar comerciales',CLS,'Activo corriente'),C('c2','Estimación de cuentas de cobranza dudosa',CLS,'Activo corriente'),C('c3','Mercaderías',CLS,'Activo corriente'),C('c4','Propiedad, planta y equipo',CLS,'Activo no corriente'),C('c5','Depreciación y amortización acumulados',CLS,'Activo no corriente'),C('c6','Servicios y otros contratados por anticipado',CLS,'Activo corriente'),C('c7','Tributos por pagar - IGV',CLS,'Pasivo corriente'),C('c8','Cuentas por pagar comerciales',CLS,'Se divide en corriente y no corriente'),C('c9','Obligaciones financieras - largo plazo',CLS,'Pasivo no corriente'),C('c10','Capital',CLS,'Patrimonio'),C('c11','Reservas - Legal',CLS,'Patrimonio'),C('c12','Resultados acumulados',CLS,'Patrimonio'),C('c13','Ventas',CLS,'Estado de resultados'),C('c14','Ingresos financieros',CLS,'Estado de resultados'),C('c15','Costo de ventas',CLS,'Estado de resultados'),C('c16','Gastos de personal y directores',CLS,'Estado de resultados'),C('c17','Gastos de servicios prestados por terceros',CLS,'Estado de resultados'),C('c18','Valuación y deterioro de activos (depreciación)',CLS,'Estado de resultados'),C('c19','Gasto financiero',CLS,'Estado de resultados')],
+    sol:['Estado de resultados: ventas, ingresos financieros, costo de ventas, gastos de personal, servicios, valuación y gasto financiero.','Las cuentas por pagar se dividen porque la información adicional da el vencimiento. Las obligaciones de largo plazo van al pasivo no corriente.']},
+   {t:'Estado de resultados: impuesto y utilidad neta',kind:'stmt',
+    teach:'<p>El estado de resultados viene <b>impreso</b> hasta la utilidad antes de impuestos (152,000). Completa dos líneas: <b>impuesto a la renta</b> (utilidad antes de impuestos × 29.5%) y <b>utilidad neta</b> (utilidad antes de impuestos − impuesto).</p>',
+    fields:[H('Estado de resultados integrales por el año terminado el 31 de diciembre de 2025 (impreso)'),G('Ventas',860000),G('(−) Costo de ventas',540000),G('Utilidad bruta',320000,true),G('(−) Gastos de personal y directores',90000),G('(−) Servicios prestados por terceros',40000),G('(−) Valuación y deterioro (depreciación)',30000),G('Utilidad operativa',160000,true),G('(+) Ingresos financieros',4000),G('(−) Gastos financieros',12000),G('Utilidad antes de impuestos',152000,true),H('Lo que completas tú'),N('ir','(−) Impuesto a la renta 29.5%',44840),NB('un','Utilidad neta',107160)],
+    sol:['Impuesto: 152,000 × 0.295 = <b>44,840</b>.','Utilidad neta: 152,000 − 44,840 = <b>107,160</b>.']},
+   {t:'Reserva legal y utilidad de libre disposición (tu hoja de borrador)',kind:'stmt',
+    teach:'<p>Reserva legal del periodo = el <b>menor</b> entre <b>a)</b> 10% de la utilidad neta y <b>c)</b> lo que falta para llegar al 20% del capital (tope − reserva actual). Datos: capital 250,000, reserva legal actual 30,000, resultados acumulados actuales 40,000.</p>',
+    fields:[N('r10','a) 10% de la utilidad neta',10716),N('cap20','b) Tope: 20% del capital',50000),N('room','c) Espacio que queda: b) − reserva legal actual',20000),NB('rl','d) Reserva legal del periodo (el menor entre a y c)',10716),NB('racum','e) Reserva legal acumulada: la actual + d)',40716),NB('ul','f) Utilidad de libre disposición: utilidad neta − d)',96444),NB('ra','g) Resultados acumulados totales: los actuales + f)',136444)],
+    sol:['a) 10% × 107,160 = 10,716.','b) 20% × 250,000 = 50,000.','c) 50,000 − 30,000 = 20,000.','d) El menor entre 10,716 y 20,000 es <b>10,716</b>.','e) 30,000 + 10,716 = <b>40,716</b>.','f) 107,160 − 10,716 = <b>96,444</b>.','g) 40,000 + 96,444 = <b>136,444</b>.']},
+   {t:'Estado de situación financiera',kind:'two',
+    teach:'<p>Activos a la izquierda; pasivos y patrimonio a la derecha. Recuerda: la depreciación y la estimación se escriben con signo menos, el <b>IR por pagar</b> (paso 2) va en el pasivo corriente, y las cuentas por pagar se dividen (100,000 en 2026 y el resto en 2027). En el patrimonio usa tu paso 3.</p>',
+    cols:[[H('ACTIVOS CORRIENTES'),N('a1','Efectivo y equivalentes de efectivo',340000),N('a2','Cuentas por cobrar comerciales',80000),N('a2b','(−) Estimación de cobranza dudosa',-5000),N('a3','Mercaderías',120000),N('a4','Servicios y otros contratados por anticipado',15000),NB('ac','Total activo corriente',550000),H('ACTIVOS NO CORRIENTES'),N('a5','Propiedad, planta y equipo',300000),N('a6','(−) Depreciación y amortización acumulados',-110000),NB('anc','Total activo no corriente',190000),NB('ta','TOTAL ACTIVO',740000)],
+          [H('PASIVO CORRIENTE'),N('p1','Tributos por pagar (IGV)',18000),N('p2','Impuesto a la renta por pagar',44840),N('p3','Cuentas por pagar comerciales (2026)',100000),NB('pc','Total pasivo corriente',162840),H('PASIVO NO CORRIENTE'),N('p4','Cuentas por pagar comerciales (2027)',60000),N('p5','Obligaciones financieras largo plazo',90000),NB('pnc','Total pasivo no corriente',150000),NB('tp','TOTAL PASIVO',312840),H('PATRIMONIO'),N('e1','Capital',250000),N('e2','Reserva legal',40716),N('e3','Resultados acumulados',136444),NB('pat','Total patrimonio',427160),NB('tpp','TOTAL PASIVO Y PATRIMONIO',740000)]],
+    sol:['Activo corriente: 340,000 + 80,000 − 5,000 + 120,000 + 15,000 = <b>550,000</b>. No corriente: 300,000 − 110,000 = <b>190,000</b>. Total activo: <b>740,000</b>.','Pasivo corriente: IGV 18,000 + IR 44,840 + cuentas por pagar 2026 100,000 = <b>162,840</b>.','Pasivo no corriente: cuentas por pagar 2027 (160,000 − 100,000 = 60,000) + obligaciones 90,000 = <b>150,000</b>. Total pasivo: <b>312,840</b>.','Patrimonio: 250,000 + 40,716 + 136,444 = <b>427,160</b>.','Cuadre: 312,840 + 427,160 = <b>740,000</b>.']},
+   {t:'Tabla "Se solicita"',kind:'stmt',
+    teach:'<p>No calculas nada nuevo: copia los números de los pasos anteriores. Al lado de cada ítem te digo de qué paso sale.</p>',
+    fields:[N('q1','1. Reserva legal elegida del periodo (paso 3, d)',10716),N('q2','2. Reserva legal acumulada (paso 3, e)',40716),N('q3','3. Utilidad de libre disposición (paso 3, f)',96444),N('q4','4. Total activo corriente (paso 4)',550000),N('q5','5. Total activo no corriente (paso 4)',190000),N('q6','6. Total pasivo corriente (paso 4)',162840),N('q7','7. Total patrimonio (paso 4)',427160),N('q8','8. Total resultados acumulados (paso 3, g)',136444),N('q9','9. Impuesto a la renta 3.ª categoría del ejercicio (paso 2)',44840)],
+    sol:['Ítems 1, 2, 3 y 8 del paso 3. Ítems 4, 5, 6 y 7 del balance (paso 4). Ítem 9 del paso 2.']}]},
  {id:'x-p2',title:'Práctica 2: PAPELERA ANDINA (el tope de la reserva manda)',
-  enun:'<p>PAPELERA ANDINA S.A.C. presenta este balance de comprobación ajustado al 31.12.2025. Esta vez el estado de resultados viene en blanco: complétalo entero.</p><p><b>Información adicional:</b> de las cuentas por pagar comerciales, S/ 60,000 se pagarán en 2026 y el saldo restante en 2027. Las obligaciones financieras son de corto plazo. IR 29.5%.</p>',
+  enun:'<p>PAPELERA ANDINA S.A.C. presenta este balance de comprobación ajustado al 31.12.2025. Esta vez el estado de resultados viene <b>en blanco</b>: complétalo entero.</p><p><b>Información adicional:</b> de las cuentas por pagar comerciales, S/ 60,000 se pagarán en 2026 y el saldo restante en 2027. Las obligaciones financieras son de corto plazo. IR 29.5%.</p>',
   enunTable:{head:['Cuentas contables','Saldos','Deudor','Acreedor'],rows:[
    ['Efectivo y equivalentes de efectivo','180,000','180,000',''],['Cuentas por cobrar comerciales','60,000','60,000',''],['Estimación de cuentas de cobranza dudosa','4,000','','4,000'],['Mercaderías','230,000','230,000',''],['Propiedad, planta y equipo','430,000','430,000',''],['Depreciación y amortización acumulados','140,000','','140,000'],['Servicios y otros contratados por anticipado','20,000','20,000',''],
    ['Tributos por pagar - IGV','25,000','','25,000'],['Remuneraciones y participaciones por pagar','16,000','','16,000'],['Cuentas por pagar comerciales','130,000','','130,000'],['Obligaciones financieras - corto plazo','30,000','','30,000'],['Capital','300,000','','300,000'],['Reservas - Legal','56,000','','56,000'],['Resultados acumulados','16,000','','16,000'],['Ventas','1,150,000','','1,150,000'],['Ingresos financieros','3,000','','3,000'],
    ['Costo de ventas','700,000','700,000',''],['Gastos de personal y directores','120,000','120,000',''],['Gastos de servicios prestados por terceros','50,000','50,000',''],['Otros gastos de gestión - seguros','18,000','18,000',''],['Valuación y deterioro de activos (depreciación)','40,000','40,000',''],['Gasto financiero','22,000','22,000',''],['!TOTALES','','1,870,000','1,870,000']]},
-  layout:'stmt',fieldsTitle:'Tu hoja de examen: estado de resultados, balance y tabla "Se solicita"',
-  fields:[H('Estado de resultados integrales, por el año terminado el 31 de diciembre de 2025'),
-   N('v','Ventas',1150000),N('c','(−) Costo de ventas',700000),NB('ub','Utilidad bruta',450000),N('gp','(−) Gastos de personal y directores',120000),N('gs','(−) Servicios prestados por terceros',50000),N('gg','(−) Otros gastos de gestión (seguros)',18000),N('gd','(−) Valuación y deterioro (depreciación)',40000),NB('uo','Utilidad operativa',222000),
-   N('if','(+) Ingresos financieros',3000),N('gf','(−) Gastos financieros',22000),NB('uai','Utilidad antes de impuestos',203000),N('ir','(−) Impuesto a la renta 29.5%',59885),NB('un','Utilidad neta',143115),N('rl','Reserva legal del periodo',4000),NB('ul','Utilidad de libre disposición',139115),
-   H('Borrador: reserva legal'),N('r10','10% de la utilidad neta',14311.5),N('room','Lo que falta para llegar al 20% del capital',4000),
-   H('Estado de situación financiera al 31 de diciembre de 2025'),
-   H('ACTIVO CORRIENTE'),N('a1','Efectivo y equivalentes de efectivo',180000),N('a2','Cuentas por cobrar comerciales',60000),N('a2b','(−) Estimación de cobranza dudosa',-4000),N('a3','Mercaderías',230000),N('a4','Servicios y otros contratados por anticipado',20000),NB('ac','Total activo corriente',486000),
-   H('ACTIVO NO CORRIENTE'),N('a5','Propiedad, planta y equipo',430000),N('a6','(−) Depreciación y amortización acumulados',-140000),NB('anc','Total activo no corriente',290000),NB('ta','TOTAL ACTIVO',776000),
-   H('PASIVO CORRIENTE'),N('p1','Tributos por pagar (IGV)',25000),N('p1b','Remuneraciones por pagar',16000),N('p2','Obligaciones financieras corto plazo',30000),N('p3','Impuesto a la renta por pagar',59885),N('p4','Cuentas por pagar comerciales (2026)',60000),NB('pc','Total pasivo corriente',190885),
-   H('PASIVO NO CORRIENTE'),N('p5','Cuentas por pagar comerciales (2027)',70000),NB('pnc','Total pasivo no corriente',70000),NB('tp','TOTAL PASIVO',260885),
-   H('PATRIMONIO'),N('e1','Capital',300000),N('e2','Reserva legal',60000),N('e3','Resultados acumulados',155115),NB('pat','Total patrimonio',515115),NB('tpp','TOTAL PASIVO Y PATRIMONIO',776000),
-   H('Se solicita (tabla de respuestas)'),
-   N('q1','1. Reserva legal elegida del periodo',4000),N('q2','2. Reserva legal acumulada',60000),N('q3','3. Utilidad de libre disposición',139115),N('q4','4. Total activo corriente',486000),N('q5','5. Total activo no corriente',290000),N('q6','6. Total pasivo corriente',190885),N('q7','7. Total patrimonio',515115),N('q8','8. Total resultados acumulados',155115),N('q9','9. Impuesto a la renta 3.ª categoría del ejercicio',59885)],
-  steps:['Utilidad bruta: 1,150,000 − 700,000 = <b>450,000</b>. Gastos operativos: 120,000 + 50,000 + 18,000 + 40,000 = 228,000. Utilidad operativa: <b>222,000</b>.','Más ingresos financieros 3,000 y menos gastos financieros 22,000: utilidad antes de impuestos <b>203,000</b>.','IR: 203,000 × 29.5% = <b>59,885</b>. Utilidad neta: <b>143,115</b>.','Reserva: 10% = 14,311.5. Tope: 20% × 300,000 = 60,000, menos 56,000 = solo 4,000 de espacio. La reserva del periodo es el menor: <b>4,000</b>. Acumulada: <b>60,000</b>.','Libre disposición: 143,115 − 4,000 = <b>139,115</b>. Resultados acumulados: 16,000 + 139,115 = <b>155,115</b>.','Activo corriente: 180,000 + 60,000 − 4,000 + 230,000 + 20,000 = <b>486,000</b>. No corriente: 430,000 − 140,000 = <b>290,000</b>. Total: 776,000.','Pasivo corriente: IGV 25,000 + remuneraciones 16,000 + obligaciones de corto plazo 30,000 + IR 59,885 + cuentas por pagar 2026 60,000 = <b>190,885</b>. No corriente: 130,000 − 60,000 = <b>70,000</b>. Total pasivo: 260,885.','Patrimonio: 300,000 + 60,000 + 155,115 = <b>515,115</b>. Cuadre: 260,885 + 515,115 = 776,000.'],
+  blocks:[
+   {t:'Clasifica cada cuenta',kind:'class',
+    teach:'<p>Escribe dónde va cada cuenta del balance. Fíjate en los plazos: las obligaciones de <b>corto</b> plazo van al pasivo corriente.</p>',
+    fields:[C('c0','Efectivo y equivalentes de efectivo',CLS,'Activo corriente'),C('c1','Cuentas por cobrar comerciales',CLS,'Activo corriente'),C('c2','Estimación de cuentas de cobranza dudosa',CLS,'Activo corriente'),C('c3','Mercaderías',CLS,'Activo corriente'),C('c4','Propiedad, planta y equipo',CLS,'Activo no corriente'),C('c5','Depreciación y amortización acumulados',CLS,'Activo no corriente'),C('c6','Servicios y otros contratados por anticipado',CLS,'Activo corriente'),C('c7','Tributos por pagar - IGV',CLS,'Pasivo corriente'),C('c8','Remuneraciones y participaciones por pagar',CLS,'Pasivo corriente'),C('c9','Cuentas por pagar comerciales',CLS,'Se divide en corriente y no corriente'),C('c10','Obligaciones financieras - corto plazo',CLS,'Pasivo corriente'),C('c11','Capital',CLS,'Patrimonio'),C('c12','Reservas - Legal',CLS,'Patrimonio'),C('c13','Resultados acumulados',CLS,'Patrimonio'),C('c14','Ventas',CLS,'Estado de resultados'),C('c15','Ingresos financieros',CLS,'Estado de resultados'),C('c16','Costo de ventas',CLS,'Estado de resultados'),C('c17','Gastos de personal y directores',CLS,'Estado de resultados'),C('c18','Gastos de servicios prestados por terceros',CLS,'Estado de resultados'),C('c19','Otros gastos de gestión - seguros',CLS,'Estado de resultados'),C('c20','Valuación y deterioro de activos (depreciación)',CLS,'Estado de resultados'),C('c21','Gasto financiero',CLS,'Estado de resultados')],
+    sol:['Hay 7 cuentas del estado de resultados: ventas, ingresos financieros, costo, personal, servicios, seguros, valuación y gasto financiero.','Las remuneraciones por pagar y el IGV van al pasivo corriente. Las cuentas por pagar se dividen.']},
+   {t:'Estado de resultados completo',kind:'stmt',
+    teach:'<p>Esta vez el estado de resultados viene <b>en blanco</b>. Escribe los gastos como números positivos: el signo (−) ya está en el nombre de la línea. Orden: ventas, costo → <b>utilidad bruta</b>; gastos operativos → <b>utilidad operativa</b>; ingresos y gastos financieros → <b>utilidad antes de impuestos</b>; impuesto (29.5%) → <b>utilidad neta</b>.</p>',
+    fields:[H('Estado de resultados integrales por el año terminado el 31 de diciembre de 2025'),N('v','Ventas',1150000),N('c','(−) Costo de ventas',700000),NB('ub','Utilidad bruta',450000),N('gp','(−) Gastos de personal y directores',120000),N('gs','(−) Servicios prestados por terceros',50000),N('gg','(−) Otros gastos de gestión (seguros)',18000),N('gd','(−) Valuación y deterioro (depreciación)',40000),NB('uo','Utilidad operativa',222000),N('if','(+) Ingresos financieros',3000),N('gf','(−) Gastos financieros',22000),NB('uai','Utilidad antes de impuestos',203000),N('ir','(−) Impuesto a la renta 29.5%',59885),NB('un','Utilidad neta',143115)],
+    sol:['Utilidad bruta: 1,150,000 − 700,000 = <b>450,000</b>.','Gastos operativos: 120,000 + 50,000 + 18,000 + 40,000 = 228,000. Utilidad operativa: <b>222,000</b>.','Más 3,000 y menos 22,000: utilidad antes de impuestos <b>203,000</b>.','Impuesto: 203,000 × 0.295 = <b>59,885</b>. Utilidad neta: <b>143,115</b>.']},
+   {t:'Reserva legal y utilidad de libre disposición (tu hoja de borrador)',kind:'stmt',
+    teach:'<p>Aquí está la trampa del ejercicio: mira el <b>tope</b>. Datos: capital 300,000, reserva legal actual 56,000, resultados acumulados actuales 16,000. La reserva del periodo es el <b>menor</b> entre el 10% de la utilidad neta y el espacio que queda hasta el 20% del capital.</p>',
+    fields:[N('r10','a) 10% de la utilidad neta',14311.5),N('cap20','b) Tope: 20% del capital',60000),N('room','c) Espacio que queda: b) − reserva legal actual',4000),NB('rl','d) Reserva legal del periodo (el menor entre a y c)',4000),NB('racum','e) Reserva legal acumulada: la actual + d)',60000),NB('ul','f) Utilidad de libre disposición: utilidad neta − d)',139115),NB('ra','g) Resultados acumulados totales: los actuales + f)',155115)],
+    sol:['a) 10% × 143,115 = 14,311.5.','b) 20% × 300,000 = 60,000.','c) 60,000 − 56,000 = <b>4,000</b>.','d) El menor entre 14,311.5 y 4,000 es <b>4,000</b>. El tope manda.','e) 56,000 + 4,000 = <b>60,000</b> (la reserva llegó al tope).','f) 143,115 − 4,000 = <b>139,115</b>.','g) 16,000 + 139,115 = <b>155,115</b>.']},
+   {t:'Estado de situación financiera',kind:'two',
+    teach:'<p>Activos a la izquierda; pasivos y patrimonio a la derecha. Recuerda: depreciación y estimación con signo menos; el <b>IR por pagar</b> (paso 2) y las remuneraciones van al pasivo corriente; las cuentas por pagar se dividen (60,000 en 2026 y el resto en 2027). En el patrimonio usa tu paso 3.</p>',
+    cols:[[H('ACTIVOS CORRIENTES'),N('a1','Efectivo y equivalentes de efectivo',180000),N('a2','Cuentas por cobrar comerciales',60000),N('a2b','(−) Estimación de cobranza dudosa',-4000),N('a3','Mercaderías',230000),N('a4','Servicios y otros contratados por anticipado',20000),NB('ac','Total activo corriente',486000),H('ACTIVOS NO CORRIENTES'),N('a5','Propiedad, planta y equipo',430000),N('a6','(−) Depreciación y amortización acumulados',-140000),NB('anc','Total activo no corriente',290000),NB('ta','TOTAL ACTIVO',776000)],
+          [H('PASIVO CORRIENTE'),N('p1','Tributos por pagar (IGV)',25000),N('p1b','Remuneraciones por pagar',16000),N('p2','Obligaciones financieras corto plazo',30000),N('p3','Impuesto a la renta por pagar',59885),N('p4','Cuentas por pagar comerciales (2026)',60000),NB('pc','Total pasivo corriente',190885),H('PASIVO NO CORRIENTE'),N('p5','Cuentas por pagar comerciales (2027)',70000),NB('pnc','Total pasivo no corriente',70000),NB('tp','TOTAL PASIVO',260885),H('PATRIMONIO'),N('e1','Capital',300000),N('e2','Reserva legal',60000),N('e3','Resultados acumulados',155115),NB('pat','Total patrimonio',515115),NB('tpp','TOTAL PASIVO Y PATRIMONIO',776000)]],
+    sol:['Activo corriente: 180,000 + 60,000 − 4,000 + 230,000 + 20,000 = <b>486,000</b>. No corriente: 430,000 − 140,000 = <b>290,000</b>. Total activo: <b>776,000</b>.','Pasivo corriente: 25,000 + 16,000 + 30,000 + 59,885 + 60,000 = <b>190,885</b>.','Pasivo no corriente: 130,000 − 60,000 = <b>70,000</b>. Total pasivo: <b>260,885</b>.','Patrimonio: 300,000 + 60,000 + 155,115 = <b>515,115</b>.','Cuadre: 260,885 + 515,115 = <b>776,000</b>.']},
+   {t:'Tabla "Se solicita"',kind:'stmt',
+    teach:'<p>No calculas nada nuevo: copia los números de los pasos anteriores. Al lado de cada ítem te digo de qué paso sale.</p>',
+    fields:[N('q1','1. Reserva legal elegida del periodo (paso 3, d)',4000),N('q2','2. Reserva legal acumulada (paso 3, e)',60000),N('q3','3. Utilidad de libre disposición (paso 3, f)',139115),N('q4','4. Total activo corriente (paso 4)',486000),N('q5','5. Total activo no corriente (paso 4)',290000),N('q6','6. Total pasivo corriente (paso 4)',190885),N('q7','7. Total patrimonio (paso 4)',515115),N('q8','8. Total resultados acumulados (paso 3, g)',155115),N('q9','9. Impuesto a la renta 3.ª categoría del ejercicio (paso 2)',59885)],
+    sol:['Ítems 1, 2, 3 y 8 del paso 3. Ítems 4, 5, 6 y 7 del balance (paso 4). Ítem 9 del paso 2.']}],
   note:'La reserva del periodo NO es 10% de la utilidad neta aquí: el tope solo deja 4,000. Si pusiste 14,312, la reserva acumulada, la utilidad libre, los resultados acumulados y el patrimonio salen mal, y el balance no cuadra.'}
  ]}
 ];
@@ -933,8 +954,9 @@ function resumenHTML(){
 
 /* ---------- Estado ---------- */
 var KEY='cg-estudio-v2';
-var state={done:{}};
+var state={done:{},blocks:{}};
 try{ var raw=localStorage.getItem(KEY); if(raw){ var o=JSON.parse(raw); if(o&&o.done&&typeof o.done==='object') state=o; } }catch(e){}
+if(!state.blocks||typeof state.blocks!=='object') state.blocks={};
 function save(){ try{ localStorage.setItem(KEY,JSON.stringify(state)); }catch(e){} }
 function topicsWork(){ return TOPICS.filter(function(t){return !t.special;}); }
 function topicIds(t){ return (t.real||[]).map(function(e){return e.id;}).concat((t.practice||[]).map(function(e){return e.id;})); }
@@ -976,7 +998,20 @@ function showParts(ex){
 function stepsHTML(ex){
   return '<ol class="steps">'+ex.steps.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ol>';
 }
-function stp(n,t){ return '<h5 class="stp"><span class="n">'+n+'</span>'+t+'</h5>'; }
+function stp(n,t,extra){ return '<h5 class="stp"><span class="n">'+n+'</span>'+t+(extra?'<span class="pr">'+extra+'</span>':'')+'</h5>'; }
+
+function blockFields(b){ return b.kind==='two'?b.cols[0].concat(b.cols[1]):b.fields; }
+function blockForm(ex,b){
+  if(b.kind==='class') return '<div class="fields">'+b.fields.map(function(f){return fieldHTML(ex,f);}).join('')+'</div>';
+  if(b.kind==='two') return '<div class="two">'+b.cols.map(function(c){return stmtHTML(ex,'form',c);}).join('')+'</div>';
+  return stmtHTML(ex,'form',b.fields);
+}
+function blockShow(ex,b){
+  if(b.kind==='class') return tableHTML({head:['Cuenta del balance','Va en'],rows:b.fields.map(function(f){return [f.label,f.a];})});
+  if(b.kind==='two') return '<div class="two">'+b.cols.map(function(c){return stmtHTML(ex,'show',c);}).join('')+'</div>';
+  return stmtHTML(ex,'show',b.fields);
+}
+function listSteps(arr){ return '<ol class="steps">'+arr.map(function(x){return '<li>'+x+'</li>';}).join('')+'</ol>'; }
 
 function realCard(ex){
   var on=!!state.done[ex.id];
@@ -984,14 +1019,40 @@ function realCard(ex){
    '<div class="exh"><h4>'+ex.title+'</h4><span class="pill'+(on?' ok':'')+'" data-pill>'+(on?'Entendido':'Por leer')+'</span></div>'+
    '<p class="src">'+ex.source+'</p>'+
    '<div class="enun">'+ex.enun+'</div>'+(ex.enunTable?tableHTML(ex.enunTable):'');
-  h+=stp(1,'Cálculos (en tu borrador)')+stepsHTML(ex);
-  h+=stp(2,'Así queda tu hoja de examen')+showParts(ex);
-  if(ex.sheets) h+=LEG;
+  if(ex.blocks){
+    ex.blocks.forEach(function(b,i){
+      h+=stp(i+1,b.t)+'<div class="teach">'+b.teach+'</div>'+blockShow(ex,b)+(b.sol?'<div class="tcap">Cálculo de este paso</div>'+listSteps(b.sol):'');
+    });
+    if(ex.finalER) h+=stp(ex.blocks.length+1,'Así queda el estado de resultados completo en tu hoja')+stmtHTML(ex,'show',ex.finalER);
+  } else {
+    h+=stp(1,'Cálculos (en tu borrador)')+stepsHTML(ex);
+    h+=stp(2,'Así queda tu hoja de examen')+showParts(ex);
+    if(ex.sheets) h+=LEG;
+  }
   if(ex.note) h+='<div class="note"><b>Ojo:</b> '+ex.note+'</div>';
   h+='<div class="actions"><button type="button" class="btn" data-action="understood" aria-pressed="'+(on?'true':'false')+'">'+(on?'Lo entendí ✓':'Marcar como entendido')+'</button></div></article>';
   return h;
 }
+function practiceBlocks(ex){
+  var on=!!state.done[ex.id];
+  var h='<article class="card" id="'+ex.id+'" data-ex="'+ex.id+'">'+
+   '<div class="exh"><h4>'+ex.title+'</h4><span class="pill'+(on?' ok':'')+'" data-pill>'+(on?'Resuelto':'Pendiente')+'</span></div>'+
+   '<div class="enun">'+ex.enun+'</div>'+(ex.enunTable?tableHTML(ex.enunTable):'');
+  ex.blocks.forEach(function(b,i){
+    var bo=!!state.blocks[ex.id+':'+i];
+    h+='<section class="blk" data-b="'+i+'">'+stp(i+1,b.t,'<span class="pill'+(bo?' ok':'')+'" data-bpill>'+(bo?'Correcto':'Pendiente')+'</span>')+
+     '<div class="teach">'+b.teach+'</div>'+blockForm(ex,b)+
+     '<div class="actions"><button type="button" class="btn primary" data-action="checkblock" data-b="'+i+'">Comprobar este paso</button></div>'+
+     '<p class="feedback" data-bfb role="status" aria-live="polite"></p>'+
+     '<details class="sol"><summary>Ver el cálculo de este paso</summary>'+(b.sol?listSteps(b.sol):'')+blockShow(ex,b)+'</details></section>';
+  });
+  h+='<p class="hintline">Decimales con punto (6697.5). Las comas de miles son opcionales. En importes grandes se acepta S/ 1 de diferencia por redondeo. La depreciación y la estimación se escriben con signo menos (por ejemplo -5,000).</p>'+
+     '<div class="actions"><button type="button" class="btn" data-action="clear">Borrar respuestas</button></div>';
+  if(ex.note) h+='<div class="note"><b>Ojo:</b> '+ex.note+'</div>';
+  return h+'</article>';
+}
 function practiceCard(ex){
+  if(ex.blocks) return practiceBlocks(ex);
   var on=!!state.done[ex.id];
   var order=ex.kardex?['kardex','sheets','fields']:(ex.layout==='stmt'?['fields']:['fields','sheets']);
   var h='<article class="card" id="'+ex.id+'" data-ex="'+ex.id+'">'+
@@ -1000,7 +1061,7 @@ function practiceCard(ex){
   var n=0;
   order.forEach(function(k){
     if(k==='kardex'&&ex.kardex){ n++; h+=stp(n,'Tabla del Kardex')+kardexTable(ex,'form'); }
-    else if(k==='sheets'&&ex.sheets){ n++; h+=stp(n,'Hoja de asientos'); ex.sheets.forEach(function(s,i){ h+=sheetForm(ex,i,s); }); }
+    else if(k==='sheets'&&ex.sheets){ n++; h+=stp(n,'Hoja de asientos'); ex.sheets.forEach(function(sh,i){ h+=sheetForm(ex,i,sh); }); }
     else if(k==='fields'&&ex.fields){
       n++; h+=stp(n,ex.fieldsTitle||'Tu hoja de examen');
       h+=ex.layout==='stmt'?stmtHTML(ex,'form'):'<div class="fields">'+ex.fields.map(function(f){return fieldHTML(ex,f);}).join('')+'</div>';
@@ -1073,9 +1134,9 @@ function checkSheet(ex,si,s){
   var missing=exp.filter(function(e){return !e.matched;}).length;
   return {ok:bad===0&&missing===0,total:exp.length,good:exp.length-missing,missing:missing};
 }
-function checkFields(ex){
+function checkFields(ex,flds){
   var total=0, ok=0;
-  ex.fields.forEach(function(f){
+  (flds||ex.fields).forEach(function(f){
     if(f.h||f.g) return;
     total++;
     var el=document.getElementById(ex.id+'__'+f.id), box=el.closest('.fld'), msg=box.querySelector('.msg'), good=false, blank=false, v=el.value;
@@ -1108,12 +1169,32 @@ function checkCard(card,ex){
   }
   updateProgress();
 }
+function checkBlock(card,ex,bi){
+  var blk=ex.blocks[bi], sec=card.querySelector('.blk[data-b="'+bi+'"]');
+  var r=checkFields(ex,blockFields(blk));
+  var fb=sec.querySelector('[data-bfb]'), pill=sec.querySelector('[data-bpill]');
+  if(r.ok===r.total){
+    state.blocks[ex.id+':'+bi]=true;
+    fb.className='feedback ok'; fb.textContent='Paso correcto.'; pill.textContent='Correcto'; pill.classList.add('ok');
+    var all=ex.blocks.every(function(x,i){return state.blocks[ex.id+':'+i];});
+    if(all){
+      state.done[ex.id]=true;
+      var p=card.querySelector('[data-pill]'); p.textContent='Resuelto'; p.classList.add('ok');
+      fb.textContent='Paso correcto. Ejercicio completo resuelto.';
+    }
+    save();
+  } else {
+    fb.className='feedback bad'; fb.textContent=r.ok+' de '+r.total+' correctas. Revisa lo marcado en rojo o abre el cálculo de este paso.';
+  }
+  updateProgress();
+}
 function clearCard(card){
   Array.prototype.forEach.call(card.querySelectorAll('input,select'),function(el){ el.value=''; el.classList.remove('ok','bad'); });
   Array.prototype.forEach.call(card.querySelectorAll('.fld,tr.ok,tr.bad'),function(el){ el.classList.remove('ok','bad'); });
   Array.prototype.forEach.call(card.querySelectorAll('.msg,.rm'),function(el){ el.textContent=''; });
   Array.prototype.forEach.call(card.querySelectorAll('td.ad'),function(el){ if(el.id) el.innerHTML='&nbsp;'; });
-  var fb=card.querySelector('[data-fb]'); fb.className='feedback'; fb.textContent='';
+  var fb=card.querySelector('[data-fb]'); if(fb){ fb.className='feedback'; fb.textContent=''; }
+  Array.prototype.forEach.call(card.querySelectorAll('[data-bfb]'),function(el){ el.className='feedback'; el.textContent=''; });
 }
 
 /* ---------- Router y eventos ---------- */
@@ -1140,6 +1221,7 @@ main.addEventListener('click',function(e){
   var ex=findEx(card.getAttribute('data-ex')); if(!ex) return;
   var a=b.getAttribute('data-action');
   if(a==='check') checkCard(card,ex);
+  else if(a==='checkblock') checkBlock(card,ex,+b.getAttribute('data-b'));
   else if(a==='clear') clearCard(card);
   else if(a==='understood'){
     var on=!state.done[ex.id]; if(on) state.done[ex.id]=true; else delete state.done[ex.id]; save();
@@ -1157,6 +1239,8 @@ main.addEventListener('keydown',function(e){
   if(e.key==='Enter'&&e.target.tagName==='INPUT'){
     var card=e.target.closest('[data-ex]'); if(!card) return;
     var ex=findEx(card.getAttribute('data-ex'));
+    var sec=e.target.closest('.blk');
+    if(ex&&ex.blocks&&sec){ e.preventDefault(); checkBlock(card,ex,+sec.getAttribute('data-b')); return; }
     if(ex&&(ex.fields||ex.sheets||ex.kardex)&&card.querySelector('[data-action=check]')){ e.preventDefault(); checkCard(card,ex); }
   }
 });
@@ -1167,7 +1251,7 @@ document.querySelector('footer.foot').addEventListener('click',function(e){
   } else if(e.target.id==='resetNo'){
     box.innerHTML='<button type="button" class="btn" id="resetBtn">Borrar progreso</button>';
   } else if(e.target.id==='resetYes'){
-    state={done:{}}; save(); show();
+    state={done:{},blocks:{}}; save(); show();
     box.innerHTML='<button type="button" class="btn" id="resetBtn">Borrar progreso</button>';
   }
 });
